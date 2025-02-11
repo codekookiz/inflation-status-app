@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import time
 from prophet import Prophet
+from datetime import datetime
 
 # 스타일 적용
 st.markdown(
@@ -106,7 +107,7 @@ def run_ml():
         monthlist = list(range(1, 13))
         month = st.selectbox("월을 선택하세요:", monthlist, index=monthlist.index(2))
     
-    if st.button('📊 수익 예측'):
+    if st.button('📊 수익 예측', disabled=not item):
         df = pd.read_csv('data/price_level_index.csv')
         if item is '선택 없음' :
             df_1 = df[['계정항목', category]]
@@ -120,24 +121,26 @@ def run_ml():
         future = model.make_future_dataframe(periods=36, freq='M')
         forecast = model.predict(future)
         
-        if month == 1 | month == 3 | month ==5 | month == 7 | month == 8 | month == 10 | month == 12 :
+        if month == 1 or month == 3 or month ==5 or month == 7 or month == 8 or month == 10 or month == 12 :
             new_date = f'{year}-{month}-31'
         elif month == 2 :
             new_date = f'{year}-{month}-28'
         else :
             new_date = f'{year}-{month}-30'
 
-        inflation_index = (forecast.loc[forecast['ds'] == new_date, 'trend'].values[0]  / df_1.iloc[df_1.index.max(), 1])
-        pred_price = int(curr_price * inflation_index)
+        pred_date = datetime.strptime(new_date, '%Y-%m-%d')
 
+        if pred_date > datetime.today() :
+            inflation_index = (forecast.loc[forecast['ds'] == new_date, 'trend'].values[0]  / df_1.iloc[df_1.index.max(), 1])
+            pred_price = int(curr_price * inflation_index)
 
-        if pred_price >= 0:
-            new_pred_price = format(pred_price, ',')
-            if item is '선택 없음' :
-                st.subheader(f'📈 {year}년 {month}월 {category}의 예상 가격: **{new_pred_price} 원**')
-            else :
-                st.subheader(f'📈 {year}년 {month}월 {item}의 예상 가격: **{new_pred_price} 원**')
+            if pred_price >= 0:
+                new_pred_price = format(pred_price, ',')
+                if item is '선택 없음' :
+                    st.subheader(f'📈 {year}년 {month}월 {category}의 예상 평균 가격: **{new_pred_price} 원**')
+                else :
+                    st.subheader(f'📈 {year}년 {month}월 {item}의 예상 가격: **{new_pred_price} 원**')
 
-            time.sleep(1)
+                time.sleep(1)
         else:
-            st.error('❌ 예측이 불가능한 데이터입니다.')
+            st.error('❌ 이미 지난 날짜이거나, 예측이 불가능한 데이터입니다.')
