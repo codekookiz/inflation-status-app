@@ -1,1 +1,1 @@
-# metro-status-app
+# inflation-status-app
