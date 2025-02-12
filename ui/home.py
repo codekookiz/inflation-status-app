@@ -16,6 +16,8 @@ def run_home():
     )
 
     st.text('')
+    st.text('이하 미완성')
+    st.text('')
 
     # 설명
     st.markdown(
