@@ -6,6 +6,7 @@ import matplotlib.font_manager as fm
 import platform
 import os
 from matplotlib import rc
+from datetime import datetime
 
 @st.cache_data
 def fontRegistered():
@@ -89,6 +90,28 @@ def run_eda():
     st.markdown("---")
 
     # 연도별 평균 수익 시각화
+    st.info('💰 현재의 식품/서비스 가격과 과거 시점을 입력하실 경우, 당시의 가격을 확인하실 수 있습니다. **(2025년 1월 기준)**')
+    price = st.number_input('💵 2025년 1월 가격 (원)', value=10000)
+    col1, col2 = st.columns(2)
+    with col1 : 
+        yearlist = list(range(2014, 2025))
+        year = st.selectbox("연도를 선택하세요:", yearlist, index=yearlist.index(2020))
+    with col2 :
+        monthlist = list(range(1, 13))
+        month = st.selectbox("월을 선택하세요:", monthlist, index=monthlist.index(10))
+    st.text('')
+
+    if month < 10 :
+        new_date = f'{year}-0{month}-01'
+    else :
+        new_date = f'{year}-{month}-01'
+    df_new = df.loc[df.index == new_date, :]
+    
+    st.dataframe(df_new)
+
+
+    st.text('이하 미완성')
+
     st.info("📅 **연도별 평균 전 세계 수익 분석**")
     #df_yearly = df.groupby("개봉 연도")["전세계 박스오피스 수익 ($)"].mean()
     #fig1 = plt.figure()

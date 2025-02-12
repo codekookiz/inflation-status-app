@@ -102,7 +102,7 @@ def run_ml():
 
     col3, col4 = st.columns(2)
     with col3 : 
-        yearlist = list(range(2025, 2028))
+        yearlist = list(range(2025, 2031))
         year = st.selectbox("연도를 선택하세요:", yearlist, index=yearlist.index(2025))
     with col4 :
         monthlist = list(range(1, 13))
@@ -121,7 +121,7 @@ def run_ml():
 
         model = Prophet()
         model.fit(df_1)
-        future = model.make_future_dataframe(periods=36, freq='M')
+        future = model.make_future_dataframe(periods=72, freq='M')
         forecast = model.predict(future)
         
         if month == 1 or month == 3 or month == 5 or month == 7 or month == 8 or month == 10 or month == 12 :
