@@ -16,15 +16,15 @@ def run_home():
     )
 
     st.text('')
-    st.text('이하 미완성')
+    st.subheader('과거 물가 비교 & 식료품 물가 예측 만 완성')
     st.text('')
 
     # 설명
     st.markdown(
         """
         <p style="font-size: 18px; text-align: center;">
-            🎬 과거 영화 데이터를 기반으로 <b>신규 영화의 예상 수익을 예측</b>하는 앱입니다!<br>
-            데이터 분석과 머신러닝 모델을 활용하여 <b>흥행 가능성을 미리 확인해보세요.</b>
+            💵 X<br>
+            X</b>
         </p>
         """, 
         unsafe_allow_html=True
