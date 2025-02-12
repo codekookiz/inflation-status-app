@@ -124,7 +124,7 @@ def run_ml():
         future = model.make_future_dataframe(periods=36, freq='M')
         forecast = model.predict(future)
         
-        if month == 1 or month == 3 or month ==5 or month == 7 or month == 8 or month == 10 or month == 12 :
+        if month == 1 or month == 3 or month == 5 or month == 7 or month == 8 or month == 10 or month == 12 :
             new_date = f'{year}-{month}-31'
         elif month == 2 :
             new_date = f'{year}-{month}-28'
