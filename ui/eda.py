@@ -113,13 +113,9 @@ def run_eda():
     st.text('이하 미완성')
 
     st.info("📅 **연도별 평균 전 세계 수익 분석**")
-    #df_yearly = df.groupby("개봉 연도")["전세계 박스오피스 수익 ($)"].mean()
-    #fig1 = plt.figure()
-    #df_yearly.plot(kind="bar", figsize=(10, 5), color="skyblue")
-    #plt.ylabel("평균 수익 ($)")
-    #plt.xlabel("연도")
-    #plt.title("연도별 평균 수익")
-    #st.pyplot(fig1)
+    fig1 = plt.figure()
+    #model.plot_components(forecast)
+    st.pyplot(fig1)
 
     st.write("""
     - 전반적으로 시간이 지남에 따라 **평균 수익이 증가하는 양상**을 보입니다.
