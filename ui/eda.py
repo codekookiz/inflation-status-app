@@ -35,7 +35,7 @@ def run_eda():
     st.markdown(
         """
         <h2 style="text-align: center; color: #FF4B4B;">
-            📊 과거 데이터 확인하기
+            📊 과거 물가는 어땠나요?
         </h2>
         <p style="font-size: 24px; text-align: center; color: ##4C82C2;">
             <b>탐색적 데이터 분석 (EDA)<b>
@@ -47,47 +47,44 @@ def run_eda():
     st.markdown("---")
 
     # 데이터 불러오기
-    st.info("📌 **기본 데이터** (new_movie.csv) : 불필요 데이터 삭제 및 클러스터링 완료")
-    #df = pd.read_csv("data/new_movie.csv", index_col=0)
-    #df["영화 유형"].replace([0, 1, 2], ["미들 마켓", "메가 블록버스터", "블록버스터"], inplace=True)
-    #df["상영 등급"].replace(['G', 'PG', 'PG-13', 'R'], ['전체 관람가', '12세 이상 관람가', '15세 이상 관람가', '청소년 관람 불가'], inplace=True)
-    #df["개봉 연도"] = df["개봉 연도"].astype(str)
+    st.info("📌 **기본 데이터** (price_level_index.csv) : 불필요 컬럼 삭제 및 식료품 데이터만 추출")
+    df = pd.read_csv("data/price_level_index.csv", index_col=0)
     
     # 데이터프레임 출력
-    #st.dataframe(df, use_container_width=True)
+    st.dataframe(df, use_container_width=True)
 
-    #st.markdown("---")
+    st.markdown("---")
 
     # 기본 통계 데이터 버튼
-    #if st.button("📈 기본 통계 데이터 보기"):
-    #    st.dataframe(df.describe())
+    if st.button("📈 기본 통계 데이터 보기"):
+        st.dataframe(df.describe())
 
-     #   st.info("""
-      #          * count : 전체 데이터 수
-       #         * mean : 평균값
-        #        * std : 표준편차
-         #       * min : 최솟값
-          #      * 25% : 최솟값으로부터 1/4 지점의 값
-           #     * 50% : 중앙값
-            #    * 75% : 최솟값으로부터 3/4 지점의 값
-             #   * max : 최댓값
-              #  """)
+        st.info("""
+                * count : 전체 데이터 수
+                * mean : 평균값
+                * std : 표준편차
+                * min : 최솟값
+                * 25% : 최솟값으로부터 1/4 지점의 값
+                * 50% : 중앙값
+                * 75% : 최솟값으로부터 3/4 지점의 값
+                * max : 최댓값
+                """)
 
     st.markdown("---")
 
     # 최대/최소 데이터 확인
     st.info("📌 **최대/최소 데이터 확인하기**")
 
-    menu2 = ["제작 비용 ($)", "북미 박스오피스 수익 ($)", "전세계 박스오피스 수익 ($)", "개봉 주말 수익 ($)", "상영관 수", "상영 시간", "개봉 연도"]
+    menu2 = df.columns.tolist()
     selected_column = st.selectbox("📌 비교할 컬럼 선택", menu2)
 
     # 최댓값 데이터
     st.markdown("✅ **최댓값 데이터**")
-    #st.dataframe(df.loc[df[selected_column] == df[selected_column].max(), :])
+    st.dataframe(df.loc[df[selected_column] == df[selected_column].max(), selected_column])
 
     # 최솟값 데이터
     st.markdown("✅ **최솟값 데이터**")
-    #st.dataframe(df.loc[df[selected_column] == df[selected_column].min(), :])
+    st.dataframe(df.loc[df[selected_column] == df[selected_column].min(), selected_column])
 
     st.markdown("---")
 
