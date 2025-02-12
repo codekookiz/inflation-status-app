@@ -91,7 +91,7 @@ def run_eda():
 
     # 연도별 평균 수익 시각화
     st.info('💰 현재의 식품/서비스 가격과 과거 시점을 입력하실 경우, 당시의 가격을 확인하실 수 있습니다. **(2025년 1월 기준)**')
-    price = st.number_input('💵 2025년 1월 가격 (원)', value=10000)
+    price = st.number_input('💵 2025년 1월 가격 (원)', value=10000, step=1000)
     col1, col2 = st.columns(2)
     with col1 : 
         yearlist = list(range(2014, 2025))
@@ -101,11 +101,18 @@ def run_eda():
         month = st.selectbox("월을 선택하세요:", monthlist, index=monthlist.index(10))
     st.text('')
 
+    st.info("""
+        None으로 출력되는 데이터의 경우 해당 시점에 데이터가 없는 것으로,\n\n 
+        해당 컬럼의 좌측에 위치한 더 큰 범주의 컬럼(빵 및 곡물, 과일 등)으로 가격 확인이 가능합니다.
+    """)
+
     if month < 10 :
         new_date = f'{year}-0{month}-01'
     else :
         new_date = f'{year}-{month}-01'
     df_new = df.loc[df.index == new_date, :]
+
+    df_new = (df_new * price / 100).round(-1)
     
     st.dataframe(df_new)
 
