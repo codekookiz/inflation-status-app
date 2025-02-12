@@ -9,7 +9,7 @@ def run_home():
     st.markdown(
         """
         <h2 style="text-align: center; color: #FF4B4B;">
-            🎥 영화 수익 예측 개요
+            💵 물가 예측 서비스 개요
         </h2>
         """, 
         unsafe_allow_html=True
