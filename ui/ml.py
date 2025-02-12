@@ -5,6 +5,7 @@ import pandas as pd
 import time
 from prophet import Prophet
 from datetime import datetime
+import matplotlib.pyplot as plt
 
 # 스타일 적용
 st.markdown(
@@ -101,7 +102,7 @@ def run_ml():
 
     col3, col4 = st.columns(2)
     with col3 : 
-        yearlist = list(range(2025, 2031))
+        yearlist = list(range(2025, 2028))
         year = st.selectbox("연도를 선택하세요:", yearlist, index=yearlist.index(2025))
     with col4 :
         monthlist = list(range(1, 13))
@@ -120,7 +121,7 @@ def run_ml():
 
         model = Prophet()
         model.fit(df_1)
-        future = model.make_future_dataframe(periods=72, freq='M')
+        future = model.make_future_dataframe(periods=36, freq='M')
         forecast = model.predict(future)
         
         if month == 1 or month == 3 or month ==5 or month == 7 or month == 8 or month == 10 or month == 12 :
@@ -132,20 +133,35 @@ def run_ml():
 
         pred_date = datetime.strptime(new_date, '%Y-%m-%d')
 
+        
+
         ## 차트 만들어서, 물가 동향 보여주자. (범위를 선택 날짜까지로 할 수 있으면 좋을 듯?)
 
         if pred_date > datetime.today() :
-            inflation_index = (forecast.loc[forecast['ds'] == new_date, 'trend'].values[0]  / df_1.iloc[df_1.index.max(), 1])
+            std_price = df_1.iloc[df_1.index.max(), 1]
+            then_price = forecast.loc[forecast['ds'] == new_date, 'yhat'].values[0]
+            inflation_index = (then_price / std_price)
             pred_price = int(curr_price * inflation_index)
 
-            if pred_price >= 0:
+            if pred_price >= 0: 
+                fig, ax = plt.subplots(figsize=(12, 5))
+                ax.plot(forecast['ds'], forecast['yhat'] / std_price * curr_price, label='가격 동향', color='blue')
+                ax.axvline(datetime.today(), color='red', linestyle='dashed', label='오늘 날짜')
+                ax.scatter(pred_date, then_price / std_price * curr_price, color='black', s=30, label='예측 가격', zorder=3)
+                ax.set_title(f'{item} 가격 예측', fontsize=16)
+                ax.set_xlabel('날짜')
+                ax.set_ylabel('예상 가격')
+                ax.legend()
+                ax.grid(True)
+                st.pyplot(fig)
+
                 new_pred_price = format(pred_price, ',')
                 if item == '기타':
                     if category == '음식 서비스' :
                         category = '외식'
-                    st.subheader(f'📈 {year}년 {month}월 {category}의 예상 평균 가격: **{new_pred_price} 원**')
+                    st.subheader(f'📈 {year}년 {month}월 {category}의 예상 평균 가격은 {new_pred_price} 원입니다.')
                 else :
-                    st.subheader(f'📈 {year}년 {month}월 {item}의 예상 가격: **{new_pred_price} 원**')
+                    st.subheader(f'📈 {year}년 {month}월 {item}의 예상 가격은 {new_pred_price} 원입니다.')
 
                 time.sleep(1)
         else:
