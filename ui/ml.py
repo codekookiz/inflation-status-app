@@ -101,13 +101,13 @@ def run_ml():
 
     col3, col4 = st.columns(2)
     with col3 : 
-        yearlist = list(range(2025, 2028))
+        yearlist = list(range(2025, 2031))
         year = st.selectbox("연도를 선택하세요:", yearlist, index=yearlist.index(2025))
     with col4 :
         monthlist = list(range(1, 13))
         month = st.selectbox("월을 선택하세요:", monthlist, index=monthlist.index(2))
     
-    if st.button('📊 수익 예측', disabled=not item):
+    if st.button('📊 가격 예측', disabled=not item):
         df = pd.read_csv('data/price_level_index.csv')
         if item == '선택 없음' :
             df_1 = df[['계정항목', category]]
@@ -118,7 +118,7 @@ def run_ml():
 
         model = Prophet()
         model.fit(df_1)
-        future = model.make_future_dataframe(periods=36, freq='M')
+        future = model.make_future_dataframe(periods=72, freq='M')
         forecast = model.predict(future)
         
         if month == 1 or month == 3 or month ==5 or month == 7 or month == 8 or month == 10 or month == 12 :
@@ -129,6 +129,8 @@ def run_ml():
             new_date = f'{year}-{month}-30'
 
         pred_date = datetime.strptime(new_date, '%Y-%m-%d')
+
+        ## 차트 만들어서, 물가 동향 보여주자. (범위를 선택 날짜까지로 할 수 있으면 좋을 듯?)
 
         if pred_date > datetime.today() :
             inflation_index = (forecast.loc[forecast['ds'] == new_date, 'trend'].values[0]  / df_1.iloc[df_1.index.max(), 1])
