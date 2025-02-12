@@ -109,7 +109,7 @@ def run_ml():
     
     if st.button('📊 수익 예측', disabled=not item):
         df = pd.read_csv('data/price_level_index.csv')
-        if item is '선택 없음' :
+        if item == '선택 없음' :
             df_1 = df[['계정항목', category]]
         else :
             df_1 = df[['계정항목', item]]
@@ -136,7 +136,7 @@ def run_ml():
 
             if pred_price >= 0:
                 new_pred_price = format(pred_price, ',')
-                if item is '선택 없음' :
+                if item == '선택 없음' :
                     st.subheader(f'📈 {year}년 {month}월 {category}의 예상 평균 가격: **{new_pred_price} 원**')
                 else :
                     st.subheader(f'📈 {year}년 {month}월 {item}의 예상 가격: **{new_pred_price} 원**')
