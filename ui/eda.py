@@ -53,6 +53,9 @@ def run_eda():
     
     # 데이터프레임 출력
     st.dataframe(df, use_container_width=True)
+    st.info("""
+        None으로 출력되는 데이터의 경우 해당 시점에 데이터가 존재하지 않는 것입니다.
+    """)
 
     st.markdown("---")
 
@@ -80,17 +83,17 @@ def run_eda():
     selected_column = st.selectbox("📌 비교할 컬럼 선택", menu2)
 
     # 최댓값 데이터
-    st.markdown("✅ **최댓값 데이터**")
+    st.markdown("✅ **최댓값 데이터** : 물가가 가장 높았던 시기")
     st.dataframe(df.loc[df[selected_column] == df[selected_column].max(), selected_column])
 
     # 최솟값 데이터
-    st.markdown("✅ **최솟값 데이터**")
+    st.markdown("✅ **최솟값 데이터** : 물가가 가장 낮았던 시기")
     st.dataframe(df.loc[df[selected_column] == df[selected_column].min(), selected_column])
 
     st.markdown("---")
 
     # 연도별 평균 수익 시각화
-    st.info('💰 현재의 식품/서비스 가격과 과거 시점을 입력하실 경우, 당시의 가격을 확인하실 수 있습니다. **(2025년 1월 기준)**')
+    st.info('💰 현재 식품/서비스 가격과 과거 시점을 입력할 경우, 당시의 가격을 확인할 수 있습니다. **(2025년 1월 기준)**')
     price = st.number_input('💵 2025년 1월 가격 (원)', value=10000, step=1000)
     col1, col2 = st.columns(2)
     with col1 : 
@@ -102,7 +105,7 @@ def run_eda():
     st.text('')
 
     st.info("""
-        None으로 출력되는 데이터의 경우 해당 시점에 데이터가 없는 것으로,\n\n 
+        None으로 출력되는 데이터의 경우\n\n
         해당 컬럼의 좌측에 위치한 더 큰 범주의 컬럼(빵 및 곡물, 과일 등)으로 가격 확인이 가능합니다.
     """)
 
@@ -122,14 +125,14 @@ def run_eda():
     df_eda.index = pd.to_datetime(df_eda.index, errors="coerce")
     df_eda = df_eda.apply(pd.to_numeric, errors="coerce")
 
-    st.subheader("📊 기본 식재료 vs 가공식품 물가 상승 비교")
+    st.subheader("📊 기본 식재료 vs 가공식품 및 외식 물가 상승 비교")
     food_items = ["빵 및 곡물", "육류", "어류 및 수산", "우유, 치즈 및 계란", "식용유지", "과일", "채소 및 해조", "기타 식료품"]
     processed_items = ["과자, 빙과류 및 당류", "커피, 차 및 코코아", "생수, 청량음료, 과일주스 및 채소주스", "주류", "음식 서비스"]
     df_eda["기본 식재료 평균"] = df_eda[food_items].mean(axis=1)
-    df_eda["가공식품 평균"] = df_eda[processed_items].mean(axis=1)
+    df_eda["가공식품 및 외식 평균"] = df_eda[processed_items].mean(axis=1)
     fig1, ax = plt.subplots(figsize=(10, 5))
     ax.plot(df_eda.index, df_eda["기본 식재료 평균"], label="기본 식재료", color="blue", linewidth=2)
-    ax.plot(df_eda.index, df_eda["가공식품 평균"], label="가공식품", color="red", linewidth=2)
+    ax.plot(df_eda.index, df_eda["가공식품 및 외식 평균"], label="가공식품", color="red", linewidth=2)
     ax.set_xlabel("연도", fontsize=12)
     ax.set_ylabel("평균 물가 지수", fontsize=12)
     ax.legend()
@@ -137,10 +140,11 @@ def run_eda():
     st.pyplot(fig1)
 
     st.write("""
-    - 전반적으로 시간이 지남에 따라 **평균 수익이 증가하는 양상**을 보입니다.
-    - 다만, 직전 기간 대비 큰 폭으로 수익이 감소하는 지점이 존재합니다.
-        - 𝟙. 1994~1995년 : **VHS 및 DVD의 등장 및 대중화**로 인해 홈 비디오의 수요가 증가하면서, 영화관에서 상영되는 영화들의 수익이 급격하게 감소하였습니다.
-        - 𝟚. 2020년 : **코로나-19**의 여파로 인해 영화 제작 및 수요가 크게 위축되면서 이전 기간 대비 급격한 수익 감소를 보였습니다.
+    - 기본 식재료와 가공식품의 물가 지수를 비교한 결과, **기본 식재료의 물가 상승률이 가공식품보다 높게 나타났습니다.**
+    - 2020년 이전까지는 대체적으로 가공식품의 물가 상승률이 높게 나타났으나, 2020년 이후부터는 기본 식재료의 물가 상승률이 더 높게 나타났습니다.
+        - **2020년 코로나19의 영향으로 인한 물가 변동**이 이러한 결과를 가져온 것으로 분석됩니다.
+             - 코로나19로 인해 **농수산물의 물류 및 유통망이 제한**되었고, 이와 더불어 **외식이 제한**되면서 기본 식재료의 공급은 줄고 수요는 급증하여
+             이와 같은 경향성이 발생한 것이라고 볼 수 있습니다.
     """)
 
     st.markdown("---")
@@ -150,17 +154,22 @@ def run_eda():
     price_changes = (df_last_year.iloc[-1] - df_last_year.iloc[0]) / df_last_year.iloc[0] * 100
     top_5 = price_changes.nlargest(5)
     fig2, ax = plt.subplots()
-    sb.barplot(y=top_5.index, x=top_5.values, ax=ax, palette="Reds_r")
+    bars = sb.barplot(y=top_5.index, x=top_5.values, ax=ax, palette="Reds_r")
+    for bar, value in zip(bars.patches, top_5.values):
+        ax.text(bar.get_x() + bar.get_width() - 1,  # X 좌표 (막대 끝 - 살짝 왼쪽)
+        bar.get_y() + bar.get_height() / 2,  # Y 좌표 (막대 중앙)
+        f"{value:.1f}%",  # 표시할 텍스트
+        va='center', ha='right', fontsize=10, color='white', fontweight='bold')  # 정렬 및 스타일
     ax.set_xlabel("상승률 (%)")
     ax.set_ylabel("항목")
     st.pyplot(fig2)
-
+ 
     st.write("""
-    - 뮤지컬 영화 및 액션, 어드벤처, 스릴러/서스펜스 장르의 영화 수익이 높게 나타납니다.
-        - 뮤지컬 장르의 경우, 작품성으로 인해 높은 수익을 올렸을 가능성도 존재하지만, **영화의 수가 다른 장르에 비해 적기 때문**에 이러한 양상을 보였을 가능성도 있습니다.
-        - 액션, 어드벤처, 스릴러/서스펜스 장르의 경우, **가장 메이저한 장르**로 평가받고 이에 따라 관객 수요가 높기 때문에 자연스레 평균 수익 상위권에 올라있는 것으로 분석됩니다.
-    - 코미디와 서부극 장르의 영화 수익이 낮은 것으로 파악됩니다.
-        - 두 장르 모두, **특정 취향의 관객층**을 타겟팅하는 경향이 있기 때문에 이와 같이 비교적 낮은 순위를 기록하고 있는 것이라고 이해할 수 있습니다.
+    - 2024년 기준 **물가 상승률이 가장 높은 Top 5**는 다음과 같습니다. : **무, 당근, 배추, 양배추, 보리쌀**
+    - 이러한 현상의 원인은 크게 3가지로 볼 수 있습니다.
+        - **이상기후로 인한 작황 부진** : 고온 현상과 작황 부진이 주요 채소의 생육에 부정적인 영향을 미쳤습니다.
+        - **재배 면적 감소** : 여름철 배추와 무의 재배 면적이 감소하면서 생산량이 감소해 가격 상승을 초래했습니다.
+        - **수확 시기 지연 및 저장 물량 부족** : 기상 악화로 인해 일부 채소의 수확 시기가 지연되었고, 이는 시장 공급에 차질을 빚어 가격 상승을 유발했습니다.
     """)
 
     st.markdown("---")
@@ -174,14 +183,20 @@ def run_eda():
                                         "주류", "외식", "연도", "월"]]
     monthly_avg = df_eda_categorized.groupby(["연도", "월"]).mean()
     fig3, ax = plt.subplots(figsize=(10, 6))
-    sb.heatmap(monthly_avg.T, cmap="coolwarm", linewidths=0.5, ax=ax)
+    sb.heatmap(monthly_avg.T, cmap="seismic", center=100, linewidths=0.5, ax=ax, robust=True)
     st.pyplot(fig3)
 
     st.write("""
-    - 15세 이상 관람가와 전체 관람가가 가장 높은 수익을 올린 것으로 나타납니다.
-        - 대부분의 상업 영화가 15세 이상 관람가 혹은 전체 관람가로 제작된다는 것이 이러한 경향성의 원인으로 보입니다.
-    - 12세 관람가 영화의 경우, 상술한 두 등급 영화에 비해 그 수가 비교적 적기 때문에 상대적으로 적은 수익을 올리고 있는 것으로 파악됩니다.
-    - 청소년 관람 불가 영화의 경우, **관객층의 범위가 다른 등급의 영화보다 현저히 작기 때문**에 높은 수익을 올리지 못하는 것으로 분석됩니다.
+    - **월별 평균 물가 변동률 히트맵**을 통해 **식품 및 서비스의 계절적 변동**을 확인할 수 있습니다.
+        - **빵 및 곡물, 육류, 어류 및 수산** 등은 **겨울철**에 물가가 상승하는 경향을 보이며, **과일, 채소 및 해조**는 **여름철**에 상승하는 경향을 보입니다.
+             - 빵 및 곡물, 육류, 어류 및 수산의 경우 **곡류 및 육류의 수입 비용 증가, 수온 하락으로 인한 어획량 감소** 등이 원인으로 작용했습니다.
+             - 과일, 채소 및 해조의 경우 **이상 기후로 인한 생산량 감소, 야외 활동 증가로 인한 소비 증가** 등이 원인으로 작용했습니다.
+        - **주류, 외식**은 **연말**에 물가가 상승하는 경향을 보이며, **음료류**는 **여름철**에 상승하는 경향을 보입니다.
+             - 이는 **모임 자리가 많아지는 연말**에 외식 및 주류 소비가 증가하는 경향과, **여름철 더위**로 인한 음료류 소비 증가를 반영한 것으로 분석됩니다.
+    - 식용 유지의 가격이 최근 약 2년 동안 급격히 상승하는 경향을 보였습니다.
+        - 이는 **우크라이나 전쟁, 이상기후로 인한 생산량 감소, 바이오 연료 산업 성장, 주요 생산국의 수출 제한** 등이 원인으로 작용했습니다.
+    - 과일, 채소 및 해조류의 가격은 지난 10년 동안 큰 폭으로 요동치는 모습을 보였습니다.
+        - 이러한 현상은 **이상기후로 인한 작황 불안정, 수입 과일의 환율 및 무역 정책 영향, 노동력 부족 및 인건비 상승, 유통 구조 변화, 해조류 생산량 변동** 등이 원인으로 작용했습니다.
     """)
 
     st.markdown("---")
