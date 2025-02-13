@@ -43,20 +43,22 @@ def run_ml():
     st.markdown("---")
 
     # 큰 제목
-    st.markdown('<p style="font-size: 24px; font-weight: bold; color: #333; font-family: Arial, sans-serif;">🪙 ML 기반 특정 미래 시점의 물가 예측</p>', unsafe_allow_html=True)
+    st.markdown('<p style="font-size: 24px; font-weight: bold; color: #333; font-family: Arial, sans-serif;">🪙 ML 기반 특정 미래 시점의 물가 예측 (~2030년)</p>', unsafe_allow_html=True)
 
     # 정보 박스 스타일
-    st.markdown('<p style="font-size: 16px; color: #555; font-family: Arial, sans-serif; background-color: #f0f0f0; padding: 15px; border-radius: 8px; box-shadow: 0px 2px 10px rgba(0,0,0,0.1);">미래 시점과 품목을 입력하시면, 해당 시점의 예상 가격을 알려드립니다.</p>', unsafe_allow_html=True)
+    st.markdown('<p style="font-size: 16px; color: #555; font-family: Arial, sans-serif; background-color: #f0f0f0; padding: 15px; border-radius: 8px; box-shadow: 0px 2px 10px rgba(0,0,0,0.1);">미래 시점과 품목을 입력하시면, 2030년까지 <b>향후 5년</b>의 예상 가격을 알려드립니다.</p>', unsafe_allow_html=True)
     st.text('')
 
     if st.button('❓ 물가 예측 예시') :
-        col1, col2, col3 = st.columns(3)
+        col1, col2, col3, col4 = st.columns(4)
         with col1 :
             st.image('image/result_a.png')
         with col2 :
             st.image('image/result_b.png')
         with col3 :
             st.image('image/result_c.png')
+        with col4 :
+            st.image('image/result_d.png')
 
     # 하위 제목
     st.markdown('<p style="font-size: 22px; font-weight: bold; color: #333; font-family: Arial, sans-serif; border-bottom: 3px solid #4CAF50; padding-bottom: 10px;">📌 정보 입력</p>', unsafe_allow_html=True)

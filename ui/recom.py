@@ -48,10 +48,10 @@ def run_recom(item, category, curr_price, step1_options, pred_date):
     
     st.markdown("---")
     if item == min_key :
-        st.success(f"🎉 **{category} 중에서는 {item}이(가) 가장 저렴합니다!** 🎉")
+        st.success(f"🎉 **{category} 중에서는 {item} 이(가) 가장 저렴합니다!** 🎉")
     else:
         st.markdown(f"### 🔍 대체 추천: **{min_key}**")
-        st.info(f'💡 **{min_key}**은(는) {item}보다 더 경제적인 선택이 될 수 있습니다!')
+        st.info(f'💡 **{min_key}** 은(는) {item} 보다 더 경제적인 선택이 될 수 있습니다!')
         
         df_a = df[['계정항목', item]]
         df_b = df[['계정항목', min_key]]
@@ -81,7 +81,7 @@ def run_recom(item, category, curr_price, step1_options, pred_date):
             st.success(f'💰 **예상 가격 비교**')
             st.markdown(f"- **{item} 예상 가격:** {new_price_a:,}원")
             st.markdown(f"- **{min_key} 예상 가격:** {new_price_b:,}원")
-            st.info(f'📉 **{min_key}이(가) {ratio}% 더 저렴합니다!**')
+            st.info(f'📉 **{min_key}** 이(가) **{ratio} %** 더 저렴합니다!')
             
             # 가격 변화 그래프 추가
             fig, ax = plt.subplots(figsize=(10, 5))

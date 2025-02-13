@@ -13,10 +13,10 @@ def main() :
     st.markdown(
         """
         <h1 style='text-align: center; color: color: #4C82C2;'>
-            🎬 app title
+            🍽️ 식료품 물가 예측 앱
         </h1>
         <h2 style='text-align: center; 'color: #4C82C2;'>
-            🤖 details
+            🤖 머신러닝 기반
         </h2>
         """, unsafe_allow_html=True
     )
