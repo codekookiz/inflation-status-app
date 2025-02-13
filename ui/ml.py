@@ -46,7 +46,7 @@ def run_ml():
     st.markdown('<p style="font-size: 24px; font-weight: bold; color: #333; font-family: Arial, sans-serif;">🪙 ML 기반 특정 미래 시점의 물가 예측</p>', unsafe_allow_html=True)
 
     # 정보 박스 스타일
-    st.markdown('<p style="font-size: 16px; color: #555; font-family: Arial, sans-serif; background-color: #f0f0f0; padding: 15px; border-radius: 8px; box-shadow: 0px 2px 10px rgba(0,0,0,0.1);">미래 시점과 품목을 입력하시면, 예상 가격을 알려드립니다.</p>', unsafe_allow_html=True)
+    st.markdown('<p style="font-size: 16px; color: #555; font-family: Arial, sans-serif; background-color: #f0f0f0; padding: 15px; border-radius: 8px; box-shadow: 0px 2px 10px rgba(0,0,0,0.1);">미래 시점과 품목을 입력하시면, 해당 시점의 예상 가격을 알려드립니다.</p>', unsafe_allow_html=True)
     st.text('')
 
     if st.button('❓ 물가 예측 예시') :
@@ -102,15 +102,15 @@ def run_ml():
     with col2 :
         item = st.selectbox("🥄 세부 유형을 선택하세요.", st.session_state["step2_options"], key="step2")
 
-    curr_price = st.number_input('💵 2025년 1월 기준 식품/서비스 가격 (원)', value=10000)
+    curr_price = st.number_input('💵 2025년 1월 기준, 식품/서비스를 얼마에 구매하셨나요?', value=10000)
 
     col3, col4 = st.columns(2)
     with col3 : 
         yearlist = list(range(2025, 2031))
-        year = st.selectbox("연도를 선택하세요:", yearlist, index=yearlist.index(2025))
+        year = st.selectbox("예측하고 싶은 연도를 선택하세요:", yearlist, index=yearlist.index(2025))
     with col4 :
         monthlist = list(range(1, 13))
-        month = st.selectbox("월을 선택하세요:", monthlist, index=monthlist.index(2))
+        month = st.selectbox("예측하고 싶은 월을 선택하세요:", monthlist, index=monthlist.index(2))
     
     if st.button('📊 가격 예측', disabled=not item):
         df = pd.read_csv('data/price_level_index.csv')
@@ -144,7 +144,6 @@ def run_ml():
 
         # 탭 목록 정의
         tab_names = ["식료품 물가 예측하기", "대체품 추천"]
-        #selected_index = tab_names.index(st.session_state.selected_tab)
 
         # 탭 생성 (selected_index를 활용하여 현재 탭 설정)
         tabs = st.tabs(tab_names)
@@ -200,15 +199,15 @@ def run_ml():
                     
                     if forecast.iloc[-1]['yhat'] > std_price :
                         st.write(f"""
-                        - 2030년까지 **{new_item}의 가격이 현재보다 약 {int((forecast.iloc[-1]['yhat'] / std_price - 1) * 100)}% 상승**할 것으로 예상됩니다.
+                        - 2030년 12월까지 **{new_item}의 가격이 현재보다 약 {int((forecast.iloc[-1]['yhat'] / std_price - 1) * 100)}% 상승**할 것으로 예상됩니다.
                         """)
                     elif forecast.iloc[-1]['yhat'] == std_price :
                         st.write(f"""
-                        - 2030년까지 {new_item} **가격이 현 수준을 유지할 것으로 예상**됩니다.
+                        - 2030년 12월까지 {new_item} **가격이 현 수준을 유지할 것으로 예상**됩니다.
                         """)
                     else :
                         st.write(f"""
-                        - 2030년까지 **{new_item}의 가격이 현재보다 약 {int((forecast.iloc[-1]['yhat'] / std_price - 1) * 100)}% 하락**할 것으로 예상됩니다.
+                        - 2030년 12월까지 **{new_item}의 가격이 현재보다 약 {abs(int((forecast.iloc[-1]['yhat'] / std_price - 1) * 100))}% 하락**할 것으로 예상됩니다.
                         """)
                     st.text('')
 
@@ -229,8 +228,6 @@ def run_ml():
                     """)
 
             with tabs[1]:
-                print("run_recom 호출 시도!") 
-                print(f"item={item}, category={category}, curr_price={curr_price}, step1_options={step1_options}, pred_date={pred_date}")
                 run_recom(item, category, curr_price, step1_options, pred_date)
         else:
             st.error('❌ 이미 지난 날짜이거나, 예측이 불가능한 데이터입니다.')
