@@ -116,12 +116,24 @@ def run_eda():
     
     st.dataframe(df_new)
 
+    st.markdown("---")
 
-    st.text('이하 미완성')
+    df_eda = pd.read_csv("data/price_level_index.csv", index_col=0)
+    df_eda.index = pd.to_datetime(df_eda.index, errors="coerce")
+    df_eda = df_eda.apply(pd.to_numeric, errors="coerce")
 
-    st.info("📅 **연도별 평균 전 세계 수익 분석**")
-    fig1 = plt.figure()
-    #model.plot_components(forecast)
+    st.subheader("📊 기본 식재료 vs 가공식품 물가 상승 비교")
+    food_items = ["빵 및 곡물", "육류", "어류 및 수산", "우유, 치즈 및 계란", "식용유지", "과일", "채소 및 해조", "기타 식료품"]
+    processed_items = ["과자, 빙과류 및 당류", "커피, 차 및 코코아", "생수, 청량음료, 과일주스 및 채소주스", "주류", "음식 서비스"]
+    df_eda["기본 식재료 평균"] = df_eda[food_items].mean(axis=1)
+    df_eda["가공식품 평균"] = df_eda[processed_items].mean(axis=1)
+    fig1, ax = plt.subplots(figsize=(10, 5))
+    ax.plot(df_eda.index, df_eda["기본 식재료 평균"], label="기본 식재료", color="blue", linewidth=2)
+    ax.plot(df_eda.index, df_eda["가공식품 평균"], label="가공식품", color="red", linewidth=2)
+    ax.set_xlabel("연도", fontsize=12)
+    ax.set_ylabel("평균 물가 지수", fontsize=12)
+    ax.legend()
+    ax.grid(True, linestyle="--", alpha=0.6)
     st.pyplot(fig1)
 
     st.write("""
@@ -133,15 +145,15 @@ def run_eda():
 
     st.markdown("---")
 
-    # 장르별 평균 수익 비교
-    st.info("🎭 **장르별 평균 전 세계 수익 비교**")
-    #df_genre = df.groupby("장르")["전세계 박스오피스 수익 ($)"].mean().sort_values()
-    #fig2 = plt.figure()
-    #df_genre.plot(kind="barh", figsize=(10, 5), color="lightcoral")
-    #plt.xlabel("평균 수익 ($)")
-    #plt.ylabel("장르")
-    #plt.title("장르별 평균 수익")
-    #st.pyplot(fig2)
+    st.subheader("🔥 2024년 물가 상승률 Top 5")
+    df_last_year = df_eda[df_eda.index >= df_eda.index.max() - pd.DateOffset(years=1)]
+    price_changes = (df_last_year.iloc[-1] - df_last_year.iloc[0]) / df_last_year.iloc[0] * 100
+    top_5 = price_changes.nlargest(5)
+    fig2, ax = plt.subplots()
+    sb.barplot(y=top_5.index, x=top_5.values, ax=ax, palette="Reds_r")
+    ax.set_xlabel("상승률 (%)")
+    ax.set_ylabel("항목")
+    st.pyplot(fig2)
 
     st.write("""
     - 뮤지컬 영화 및 액션, 어드벤처, 스릴러/서스펜스 장르의 영화 수익이 높게 나타납니다.
@@ -153,38 +165,23 @@ def run_eda():
 
     st.markdown("---")
 
-    # MPAA 등급별 수익 비교
-    st.info("🎬 **상영 등급별 평균 전 세계 수익 비교**")
-    #df_mpaa = df.groupby("상영 등급")["전세계 박스오피스 수익 ($)"].mean().sort_values()
-    #fig3 = plt.figure()
-    #df_mpaa.plot(kind="bar", figsize=(8, 5), color="lightgreen")
-    #plt.ylabel("평균 수익 ($)")
-    #plt.xlabel("상영 등급")
-    #plt.xticks(rotation = 0)
-    #plt.title("상영 등급별 평균 수익")
-    #st.pyplot(fig3)
+    st.subheader("📅 월별 평균 물가 변동률 히트맵")
+    df_eda = df_eda.rename(columns= {"음식 서비스":"외식"})
+    df_eda["연도"] = df_eda.index.year
+    df_eda["월"] = df_eda.index.month
+    df_eda_categorized = df_eda.loc[:, ["빵 및 곡물", "육류", "어류 및 수산", "우유, 치즈 및 계란", "식용유지", "과일", "채소 및 해조",
+                                        "과자, 빙과류 및 당류", "기타 식료품", "커피, 차 및 코코아", "생수, 청량음료, 과일주스 및 채소주스",
+                                        "주류", "외식", "연도", "월"]]
+    monthly_avg = df_eda_categorized.groupby(["연도", "월"]).mean()
+    fig3, ax = plt.subplots(figsize=(10, 6))
+    sb.heatmap(monthly_avg.T, cmap="coolwarm", linewidths=0.5, ax=ax)
+    st.pyplot(fig3)
 
     st.write("""
     - 15세 이상 관람가와 전체 관람가가 가장 높은 수익을 올린 것으로 나타납니다.
         - 대부분의 상업 영화가 15세 이상 관람가 혹은 전체 관람가로 제작된다는 것이 이러한 경향성의 원인으로 보입니다.
     - 12세 관람가 영화의 경우, 상술한 두 등급 영화에 비해 그 수가 비교적 적기 때문에 상대적으로 적은 수익을 올리고 있는 것으로 파악됩니다.
     - 청소년 관람 불가 영화의 경우, **관객층의 범위가 다른 등급의 영화보다 현저히 작기 때문**에 높은 수익을 올리지 못하는 것으로 분석됩니다.
-    """)
-
-    st.markdown("---")
-
-    # 상영관 수 vs 개봉 주말 수익 관계
-    st.info("🏛 **상영관 수 vs 개봉 주말 수익 관계 분석**")
-    #fig4 = plt.figure(figsize=(8, 6))
-    #sb.scatterplot(x=df["상영관 수"], y=df["개봉 주말 수익 ($)"], alpha=0.5, color='purple')
-    #plt.xlabel("상영관 수")
-    #plt.ylabel("개봉 주말 수익 ($)")
-    #plt.title("상영관 수와 개봉 주말 수익의 관계")
-    #st.pyplot(fig4)
-
-    st.write("""
-    - 대체적으로 완만한 분포도를 보이다가 상영관 수가 약 **3,500개**를 넘어가는 시점부터 급격히 수익이 증가합니다.
-        - 배급사, 영화제작사 입장에서 수익 극대화를 위한 상영관 수 설정을 할 때에 도움이 될 수 있는 자료입니다.
     """)
 
     st.markdown("---")

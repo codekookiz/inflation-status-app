@@ -159,6 +159,7 @@ def run_ml():
                 ax.set_title(f'{new_item} 가격 예측', fontsize=16)
                 ax.set_xlabel('날짜')
                 ax.set_ylabel('예상 가격')
+                ax.grid(True, linestyle="--", alpha=0.6)
                 ax.legend()
                 ax.grid(True)
                 st.pyplot(fig)
@@ -215,9 +216,7 @@ def run_ml():
                 - 이러한 경향성을 통해, **특정 시기에 수익이 높아지거나 낮아질 것을 예상**할 수 있습니다.
                 """)
 
-                st.markdown("---")
-
-
-
         else:
             st.error('❌ 이미 지난 날짜이거나, 예측이 불가능한 데이터입니다.')
+
+        st.markdown("---")
