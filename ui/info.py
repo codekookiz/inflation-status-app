@@ -46,9 +46,6 @@ def run_info():
         <br>
            <ul style="font-size: 18px; line-height: 1.8; color: #555;">
             <b>📊 경제 분석가 및 연구자</b> : 물가 변동 데이터를 활용하여 경제 흐름을 분석하고 연구할 수 있습니다.<br>
-        <br>
-           <ul style="font-size: 18px; line-height: 1.8; color: #555;">
-            <b>💰 투자자 및 금융 전문가</b> : 물가 변동을 기반으로 투자 전략을 수립하거나 금융 시장에 대한 인사이트를 얻을 수 있습니다.<br>
         </ul>
         """, 
         unsafe_allow_html=True
