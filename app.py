@@ -5,7 +5,6 @@ from ui.eda import run_eda
 from ui.home import run_home
 from ui.info import run_info
 from ui.ml import run_ml
-from ui.recom import run_recom
 
 
 def main() :
