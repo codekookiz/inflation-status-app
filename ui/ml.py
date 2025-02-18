@@ -46,7 +46,7 @@ def run_ml():
     st.markdown('<p style="font-size: 24px; font-weight: bold; color: #333; font-family: Arial, sans-serif;">🪙 ML 기반 특정 미래 시점의 물가 예측 (~2030년)</p>', unsafe_allow_html=True)
 
     # 정보 박스 스타일
-    st.markdown('<p style="font-size: 16px; color: #555; font-family: Arial, sans-serif; background-color: #f0f0f0; padding: 15px; border-radius: 8px; box-shadow: 0px 2px 10px rgba(0,0,0,0.1);">미래 시점과 품목을 입력하시면, 2030년까지 <b>향후 5년</b>의 예상 가격을 알려드립니다.</p>', unsafe_allow_html=True)
+    st.markdown('<p style="font-size: 16px; color: #555; font-family: Arial, sans-serif; background-color: #f0f0f0; padding: 15px; border-radius: 8px; box-shadow: 0px 2px 10px rgba(0,0,0,0.1);">미래 시점과 품목을 입력하시면, 2030년까지 <b>향후 5년</b>의 예상 물가 수준을 알려드립니다.</p>', unsafe_allow_html=True)
     st.text('')
 
     if st.button('❓ 물가 예측 예시') :
