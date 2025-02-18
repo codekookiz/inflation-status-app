@@ -50,15 +50,13 @@ def run_ml():
     st.text('')
 
     if st.button('❓ 물가 예측 예시') :
-        col1, col2, col3, col4 = st.columns(4)
+        col1, col2, col3 = st.columns(3)
         with col1 :
             st.image('image/result_a.png')
         with col2 :
             st.image('image/result_b.png')
         with col3 :
             st.image('image/result_c.png')
-        with col4 :
-            st.image('image/result_d.png')
 
     # 하위 제목
     st.markdown('<p style="font-size: 22px; font-weight: bold; color: #333; font-family: Arial, sans-serif; border-bottom: 3px solid #4CAF50; padding-bottom: 10px;">📌 정보 입력</p>', unsafe_allow_html=True)
@@ -104,8 +102,6 @@ def run_ml():
     with col2 :
         item = st.selectbox("🥄 세부 유형을 선택하세요.", st.session_state["step2_options"], key="step2")
 
-    curr_price = st.number_input('💵 2025년 1월 기준, 식품/서비스를 얼마에 구매하셨나요?', value=10000)
-
     col3, col4 = st.columns(2)
     with col3 : 
         yearlist = list(range(2025, 2031))
@@ -144,96 +140,101 @@ def run_ml():
         if "selected_tab" not in st.session_state:
             st.session_state.selected_tab = "식료품 물가 예측하기"
 
-        # 탭 목록 정의
-        tab_names = ["식료품 물가 예측하기", "대체품 추천"]
-
-        # 탭 생성 (selected_index를 활용하여 현재 탭 설정)
-        tabs = st.tabs(tab_names)
-
         if pred_date > datetime.today() :
             std_price = df_1.iloc[df_1.index.max(), 1]
             then_price = forecast.loc[forecast['ds'] == new_date, 'yhat'].values[0]
             inflation_index = (then_price / std_price)
-            pred_price = int((curr_price * inflation_index).round(-1))
-        
-        if pred_price >= 0: 
-            with tabs[0]:    
-                    st.markdown('<h2>📌 예측 결과</h2>', unsafe_allow_html=True)
-                    
-                    if new_item == '기타' :
-                        new_item = f'기타 {category}'
-                    if new_item == '음식 서비스' :
-                        new_item = '외식'
+            pred_price = (inflation_index - 1).round(3)
+           
+            st.markdown('<h2>📌 예측 결과</h2>', unsafe_allow_html=True)
+            
+            if new_item == '기타' :
+                new_item = f'기타 {category}'
+            if new_item == '음식 서비스' :
+                new_item = '외식'
 
-                    fig, ax = plt.subplots(figsize=(12, 5))
-                    ax.plot(forecast['ds'], forecast['yhat'] / std_price * curr_price, label='가격 동향', color='blue')
-                    ax.axvline(datetime.today(), color='red', linestyle='dashed', label='오늘 날짜')
-                    ax.scatter(pred_date, then_price / std_price * curr_price, color='black', s=30, label='예측 가격', zorder=3)
-                    ax.set_title(f'{new_item} 가격 예측', fontsize=16)
-                    ax.set_xlabel('날짜')
-                    ax.set_ylabel('예상 가격')
-                    ax.grid(True, linestyle="--", alpha=0.6)
-                    ax.legend()
-                    ax.grid(True)
-                    st.pyplot(fig)
+            fig, ax = plt.subplots(figsize=(12, 5))
+            ax.plot(forecast['ds'], (forecast['yhat'] / std_price) - 1, label='물가 동향', color='blue')
+            ax.axvline(datetime.today(), color='red', linestyle='dashed', label='오늘 날짜')
+            ax.scatter(pred_date, (then_price / std_price) - 1, color='black', s=30, label='현재 대비 물가 수준', zorder=3)
+            ax.set_title(f'{new_item} 가격 예측', fontsize=16)
+            ax.set_xlabel('날짜')
+            ax.set_ylabel('물가 상승 수준')
+            ax.grid(True, linestyle="--", alpha=0.6)
+            ax.legend()
+            ax.grid(True)
+            ax.set_ylim(-1, 1)
+            st.pyplot(fig)
 
-                    new_pred_price = format(pred_price, ',')
-                    st.markdown(
-                        f"""
-                        <h4 style="text-align: center;">📈 {year}년 {month}월 {new_item}의 예상 평균 가격은 {new_pred_price} 원입니다.</h4>
-                        """,
-                        unsafe_allow_html=True
-                    )
+            new_pred_price = abs(pred_price * 100).round(1)
 
-                    st.text('')
-                    
-                    fig1 = model.plot_components(forecast)
-                    
-                    fig2, ax = plt.subplots(figsize=(10, 4))  # 새로운 Figure와 Axes 생성
-                    original_ax = fig1.axes[0]  # 첫 번째 차트
-                    for line in original_ax.get_lines():
-                        ax.plot(line.get_xdata(), line.get_ydata(), label=line.get_label(), color=line.get_color())
-                    ax.set_title("가격 트렌드 변화 (Trend)", fontsize=14)
-                    ax.set_ylabel("예측 값", fontsize=12)
-                    ax.set_xlabel("날짜", fontsize=12)
-                    ax.legend()
-                    st.pyplot(fig2)
-                    
-                    if forecast.iloc[-1]['yhat'] > std_price :
-                        st.write(f"""
-                        - 2030년 12월까지 **{new_item}의 가격이 현재보다 약 {int((forecast.iloc[-1]['yhat'] / std_price - 1) * 100)}% 상승**할 것으로 예상됩니다.
-                        """)
-                    elif forecast.iloc[-1]['yhat'] == std_price :
-                        st.write(f"""
-                        - 2030년 12월까지 {new_item} **가격이 현 수준을 유지할 것으로 예상**됩니다.
-                        """)
-                    else :
-                        st.write(f"""
-                        - 2030년 12월까지 **{new_item}의 가격이 현재보다 약 {abs(int((forecast.iloc[-1]['yhat'] / std_price - 1) * 100))}% 하락**할 것으로 예상됩니다.
-                        """)
-                    st.text('')
+            if pred_price > 0: 
+                st.markdown(
+                    f"""
+                    <h4 style="text-align: center;">📈 {year}년 {month}월 {new_item}의 현재 대비 물가 상승률은 {new_pred_price} %입니다.</h4>
+                    """,
+                    unsafe_allow_html=True
+                )
+            elif pred_price == 0:
+                st.markdown(
+                    f"""
+                    <h4 style="text-align: center;">📈 {year}년 {month}월 {new_item}의 물가 수준은 현재와 동일할 것으로 예측됩니다.</h4>
+                    """,
+                    unsafe_allow_html=True
+                )
+            else:
+                st.markdown(
+                    f"""
+                    <h4 style="text-align: center;">📈 {year}년 {month}월 {new_item}의 현재 대비 물가 하락률은 {new_pred_price} %입니다.</h4>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+            st.text('')
+            
+            fig1 = model.plot_components(forecast)
+            
+            fig2, ax = plt.subplots(figsize=(10, 4))  # 새로운 Figure와 Axes 생성
+            original_ax = fig1.axes[0]  # 첫 번째 차트
+            for line in original_ax.get_lines():
+                ax.plot(line.get_xdata(), line.get_ydata(), label=line.get_label(), color=line.get_color())
+            ax.set_title("물가 트렌드 (Trend)", fontsize=14)
+            ax.set_ylabel("예측 값", fontsize=12)
+            ax.set_xlabel("날짜", fontsize=12)
+            ax.legend()
+            st.pyplot(fig2)
+            
+            if forecast.iloc[-1]['yhat'] > std_price :
+                st.write(f"""
+                - 2030년 12월까지 **{new_item}의 가격이 현재보다 약 {int((forecast.iloc[-1]['yhat'] / std_price - 1) * 100)}% 상승**할 것으로 예상됩니다.
+                """)
+            elif forecast.iloc[-1]['yhat'] == std_price :
+                st.write(f"""
+                - 2030년 12월까지 {new_item} **가격이 현 수준을 유지할 것으로 예상**됩니다.
+                """)
+            else :
+                st.write(f"""
+                - 2030년 12월까지 **{new_item}의 가격이 현재보다 약 {abs(int((forecast.iloc[-1]['yhat'] / std_price - 1) * 100))}% 하락**할 것으로 예상됩니다.
+                """)
+            st.text('')
 
 
-                    fig3, ax = plt.subplots(figsize=(10, 4))  # 새로운 Figure와 Axes 생성
-                    original_ax = fig1.axes[1]  # 두 번째 차트
-                    for line in original_ax.get_lines():
-                        ax.plot(line.get_xdata(), line.get_ydata(), label=line.get_label(), color=line.get_color())
-                    ax.set_title("주차별 경향성 (Weekly Seasonality)", fontsize=14)
-                    ax.set_ylabel("예측 값", fontsize=12)
-                    ax.set_xlabel("주차", fontsize=12)
-                    ax.legend()
-                    st.pyplot(fig3)
-                    st.write("""
-                    - 각 식료품 품목에 따라 **주차별 수익의 변동성**이 다르게 나타납니다.
-                    - 이 데이터는 연간 주기성을 가지고 있으며, **특정 주차 혹은 달에 수익이 높아지거나 낮아지는 경향**을 보입니다.
-                    - 이러한 경향성을 통해, **특정 시기에 수익이 높아지거나 낮아질 것을 예상**할 수 있습니다.
-                    """)
-
-            with tabs[1]:
-                run_recom(item, category, curr_price, step1_options, pred_date)
+            fig3, ax = plt.subplots(figsize=(10, 4))  # 새로운 Figure와 Axes 생성
+            original_ax = fig1.axes[1]  # 두 번째 차트
+            for line in original_ax.get_lines():
+                ax.plot(line.get_xdata(), line.get_ydata(), label=line.get_label(), color=line.get_color())
+            ax.set_title("주차별 경향성 (Weekly Seasonality)", fontsize=14)
+            ax.set_ylabel("예측 값", fontsize=12)
+            ax.set_xlabel("월", fontsize=12)
+            ax.legend()
+            ax.set_xticklabels([label.get_text().split('-')[1].lstrip('0') for label in ax.get_xticklabels()])
+            st.pyplot(fig3)
+            st.write("""
+            - 각 식료품 품목에 따라 **주차별 수익의 변동성**이 다르게 나타납니다.
+            - 이 데이터는 연간 주기성을 가지고 있으며, **특정 주차 혹은 달에 수익이 높아지거나 낮아지는 경향**을 보입니다.
+            - 이러한 경향성을 통해, **특정 시기에 수익이 높아지거나 낮아질 것을 예상**할 수 있습니다.
+            """)
         else:
             st.error('❌ 이미 지난 날짜이거나, 예측이 불가능한 데이터입니다.')
 
         st.markdown("---")
-
-        

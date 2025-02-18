@@ -92,16 +92,47 @@ def run_eda():
 
     st.markdown("---")
 
-    # 연도별 평균 수익 시각화
-    st.info('💰 현재 식품/서비스 가격과 과거 시점을 입력할 경우, 당시의 가격을 확인할 수 있습니다. **(2025년 1월 기준)**')
-    price = st.number_input('💵 2025년 1월 기준, 식품/서비스를 얼마에 구매하셨나요?', value=10000, step=1000)
+    step1_options = {
+        "빵 및 곡물": ["-", "쌀", "현미", "찹쌀", "보리쌀", "콩", "땅콩", "혼식곡", "밀가루", "국수", "라면", "당면", "두부", "시리얼", "부침가루",
+                   "케이크", "빵", "떡", "파스타면", "기타"],
+        "육류": ["-", "국산쇠고기", "수입쇠고기", "돼지고기", "닭고기", "소시지", "햄및베이컨", "기타육류가공품", "기타"],
+        "어류 및 수산": ["-", "갈치", "명태", "조기", "고등어", "오징어", "게", "굴", "조개", "전복", "새우", "마른멸치", "마른오징어", "낙지",
+                    "오징어채", "북어채", "어묵", "맛살", "수산물통조림", "젓갈", "기타"],
+        "우유, 치즈 및 계란": ["-", "우유", "분유", "치즈", "발효유", "달걀", "기타"],
+        "식용유지": ["-", "참기름", "식용유", "기타"],
+        "과일": ["-", "사과", "배", "복숭아", "포도", "밤", "감", "귤", "오렌지", "참외", "수박", "딸기", "바나나", "키위", "블루베리", "망고",
+               "체리", "아보카도", "파인애플", "아몬드", "과일가공품", "기타"],
+        "채소 및 해조": ["-", "배추", "상추", "시금치", "양배추", "미나리", "깻잎", "부추", "무", "열무", "당근", "감자", "고구마", "도라지",
+                     "콩나물", "버섯", "오이", "풋고추", "호박", "가지", "토마토", "파", "양파", "마늘", "브로콜리", "고사리", "파프리카", "단무지",
+                     "김", "맛김", "미역", "기타"],
+        "과자, 빙과류 및 당류": ["-", "초콜릿", "사탕", "껌", "아이스크림", "비스킷", "스낵과자", "파이", "설탕", "잼", "꿀", "물엿", "기타"],
+        "기타 식료품": ["-", "고춧가루", "참깨", "생강", "소금", "간장", "된장", "양념소스", "고추장", "카레", "식초", "드레싱", "혼합조미료", "스프",
+                   "이유식", "김치", "밑반찬", "냉동식품", "즉석식품", "편의점도시락", "삼각김밥", "기타"],
+        "커피, 차 및 코코아": ["-", "커피", "차", "기타"],
+        "생수, 청량음료, 과일주스 및 채소주스": ["-", "주스", "두유", "생수", "기능성음료", "탄산음료", "기타음료"],
+        "주류": ["-", "소주", "과실주", "맥주", "막걸리", "양주", "약주", "기타"],
+        "외식": ["-", "김치찌개백반", "된장찌개백반", "비빔밥", "설렁탕", "갈비탕", "삼계탕", "해물찜", "해장국", "불고기", "쇠고기(외식)",
+               "돼지갈비(외식)", "삼겹살(외식)", "오리고기(외식)", "냉면", "칼국수", "죽(외식)", "생선초밥", "생선회(외식)", "자장면", "짬뽕", "탕수육",
+               "볶음밥", "돈가스", "스테이크", "스파게티", "라면(외식)", "김밥", "떡볶이", "치킨", "햄버거", "피자", "쌀국수", "커피(외식)",
+               "기타음료(외식)", "소주(외식)", "맥주(외식)", "막걸리(외식)", "구내식당식사비", "도시락", "기타"]
+    }
+
+    if "step1_selected" not in st.session_state:
+        st.session_state["step1_selected"] = False
+    if "step2_options" not in st.session_state:
+        st.session_state["step2_options"] = [] 
+
+    st.info('💰 현재의 식품 구매 가격과 돌아가고 싶은 시점을 입력할 경우, 당시 가격을 확인할 수 있습니다. **(2025년 1월 기준)**')
     col1, col2 = st.columns(2)
-    with col1 : 
+    with col1 :
+        category = st.selectbox("🍽️ 식료품 유형을 선택하세요.", list(step1_options.keys()), key="step1_eda")
+        st.session_state["step2_options"] = step1_options.get(category, [])
+        st.session_state["step1_selected"] = bool(st.session_state["step2_options"])
+        price = st.number_input('💵 2025년 1월 기준, 얼마에 구매하셨나요?', value=10000, step=1000)
+    with col2 :
+        item = st.selectbox("🥄 세부 유형을 선택하세요.", st.session_state["step2_options"], key="step2_eda")
         yearlist = list(range(2014, 2025))
         year = st.selectbox("확인하고 싶은 연도를 선택하세요:", yearlist, index=yearlist.index(2020))
-    with col2 :
-        monthlist = list(range(1, 13))
-        month = st.selectbox("확인하고 싶은 월을 선택하세요:", monthlist, index=monthlist.index(10))
     st.text('')
 
     st.info("""
@@ -109,18 +140,25 @@ def run_eda():
         해당 컬럼의 좌측에 위치한 더 큰 범주의 컬럼(빵 및 곡물, 과일 등)으로 가격 확인이 가능합니다.
     """)
 
-    if month < 10 :
-        new_date = f'{year}-0{month}-01'
+    if item == "-" or item == '기타':
+        new_item = category
+        if new_item == '외식' :
+            new_item = '음식 서비스'
     else :
-        new_date = f'{year}-{month}-01'
-    df_new = df.loc[df.index == new_date, :]
+        new_item = item
+
+    min_date = f'{year}-01-01'
+    max_date = f'{year}-12-01'
+
+    df_new = df.loc[(df.index >= min_date) & (df.index <= max_date), :]
 
     df_new = (df_new * price / 100).round(-1)
+
+    df_trans = df_new[[new_item]].transpose()
     
-    st.dataframe(df_new)
+    st.dataframe(df_trans)
 
     st.markdown("---")
-
     df_eda = pd.read_csv("data/price_level_index.csv", index_col=0)
     df_eda.index = pd.to_datetime(df_eda.index, errors="coerce")
     df_eda = df_eda.apply(pd.to_numeric, errors="coerce")

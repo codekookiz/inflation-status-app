@@ -105,19 +105,22 @@ def run_dev():
     st.markdown('<h4>📌 사용자 입력 예시</h5>', unsafe_allow_html=True)
     st.markdown("""
                 ```bash
+                식료품 유형: 빵 및 곡물
+                세부 유형: 쌀
                 2025년 1월 기준 가격: 10000 
-                연도: 2014  
-                월: 11  
+                연도: 2014
                 """)
 
     st.markdown('<h4>📌 확인 결과</h4>', unsafe_allow_html=True)
     st.markdown("""
                 ```bash
-                ▶ 계정항목 : 2020-10-01
-                ▶ 빵 및 곡물 : 10100
-                ▶ 쌀 : 10390
-                ▶ 현미 : 9940
+                ▶ 쌀
+                ▶ 2014-01-01 : 8770
+                ▶ 2014-02-01 : 8770
+                ▶ 2014-03-01 : 8720
                 ...
+                ▶ 2014-11-01 : 8760
+                ▶ 2014-12-01 : 8650
                 """)
 
     st.markdown("<h4>📌 활용 방안</h4>", unsafe_allow_html=True)
@@ -130,10 +133,10 @@ def run_dev():
 
     st.markdown("---")
     
-    st.markdown('<h2>🎟 향후 식료품 가격 예측</h2>', unsafe_allow_html=True)
+    st.markdown('<h2>🎟 향후 식료품 물가 수준 예측</h2>', unsafe_allow_html=True)
 
     st.markdown('<h4>📌 목표</h4>', unsafe_allow_html=True)
-    st.write('- 식료품의 미래 예상 가격을 머신러닝을 통해 예측')
+    st.write('- 식료품의 미래 예상 물가 수준을 머신러닝을 통해 예측')
 
     st.markdown('<h4>📌 사용한 기법</h4>', unsafe_allow_html=True)
     st.write("""
@@ -143,17 +146,16 @@ def run_dev():
     st.markdown('<h4>📌 사용자 입력 예시</h4>', unsafe_allow_html=True)
     st.markdown("""
                 ```bash
-                식료품 유형: 빵 및 곡물
-                세부 유형: 현미
-                2025년 1월 기준 가격: 10000 
-                연도: 2025  
-                월: 11 
+                식료품 유형: 육류
+                세부 유형: 수입쇠고기
+                연도: 2027  
+                월: 6 
                 """)
 
     st.markdown('<h4>📌 예측 결과</h4>', unsafe_allow_html=True)
     st.markdown("""
                 ```bash
-                ▶ 예상 평균 가격 : 9220원, 2030년 12월까지 11% 하락 예상
+                ▶ 예상 물가 상승률 : 0.7%, 2030년 12월까지 9% 상승 예상
                 """)
 
     st.markdown('<h4>📌 활용 방안</h4>', unsafe_allow_html=True)
@@ -162,41 +164,6 @@ def run_dev():
     ✅ **소비자 및 기업의 가격 전략 수립**: 소비자는 저렴한 시기를 선택해 구매할 수 있고, 기업은 가격 변동을 고려하여 판매 전략을 최적화할 수 있음.  
     ✅ **공급망 및 재고 관리 최적화**: 미래 가격 변동을 예측하여 원자재 조달 전략을 조정하고, 효율적인 재고 관리가 가능함.  
     ✅ **정부 및 기관의 정책 수립 지원**: 물가 변동을 기반으로 식료품 보조금 정책이나 수급 조절 전략을 설계하는 데 활용 가능.  
-    """)
-
-    st.markdown("---")
-
-    st.markdown('<h2>🔄 대체품 추천 시스템</h2>', unsafe_allow_html=True)
-    
-    st.markdown('<h4>📌 목표</h4>', unsafe_allow_html=True)
-    st.write('- 사용자가 선택한 일자와 구매 가격, 항목을 기반으로 동일한 유형의 식료품 중 가격이 더 저렴한 대체재 제안')
-
-    st.markdown('<h4>📌 코드 프로세스</h4>', unsafe_allow_html=True)
-    st.write("""
-    - 사용자가 입력한 예측 시점을 기반으로, 선택된 항목과 동일한 유형에 속하는 식료품들의 가격을 계산하여 하나의 리스트에 저장
-    - 사용자가 선택한 항목이 동일 유형 내 가장 저렴할 경우 대체재 추천이 이루어지지 않음
-    - 더 저렴한 가격의 품목이 존재할 경우 가격 차이를 수치화 및 시각화하여 표시
-    """)
-    
-    st.markdown('<h4>📌 사용자 입력 예시</h5>', unsafe_allow_html=True)
-    st.markdown("""
-                ```bash
-                # 가격 예측 탭에서 입력한 데이터를 그대로 가져와 사용 (추가 입력 없음)
-                """)
-
-    st.markdown('<h4>📌 예측 결과</h4>', unsafe_allow_html=True)
-    st.markdown("""
-                ```bash
-                ▶ 대체품 추천 : 찹쌀
-                ▶ 예상 가격 비교 : 현미 9220원, 찹쌀 8520원
-                ▶ 가격 차이 : 찹쌀이 8% 정도 저렴
-                """)
-    
-    st.markdown('<h4>📌 활용 방안</h4>', unsafe_allow_html=True)
-    st.write("""
-    ✅ **식료품 비용 절감**: 동일한 유형의 대체품 중 저렴한 제품을 추천받아 가계 지출을 줄이는 데 도움을 받을 수 있음.  
-    ✅ **소비자 선택 다양화**: 다양한 식료품 옵션을 비교하여 가격 대비 최적의 상품을 선택할 수 있도록 지원.  
-    ✅ **소매업체 및 유통업체 활용 가능**: 마트 및 유통업체에서 실시간 가격 비교를 제공하여 고객 유입 및 판매 전략을 최적화할 수 있음. 
     """)
     
     st.markdown("---")
